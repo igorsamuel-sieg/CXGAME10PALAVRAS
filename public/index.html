@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torneio das Casas · Hogwarts</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold:    #C9A84C;
+  --gold-hi: #F0CC6A;
+  --parch:   #F5E6C8;
+  --parch-d: #C4A882;
+  --ink:     #0a0a0f;
+  --gryff-r: #740001; --gryff-g: #D3A625;
+  --rave-b:  #0E1A40; --rave-s:  #9BB0D3;
+  --huff-y:  #ECB939; --huff-k:  #372E29;
+  --slyt-g:  #1A472A; --slyt-s:  #AAAAAA;
+}
+
+body {
+  font-family: 'IM Fell English', serif;
+  background: #0a0a0f;
+  color: var(--parch);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* starfield */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at  8% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 22% 38%, rgba(255,255,255,.7), transparent),
+    radial-gradient(1px 1px at 48%  9%, #fff, transparent),
+    radial-gradient(1px 1px at 67% 58%, rgba(255,255,255,.6), transparent),
+    radial-gradient(1px 1px at 82% 23%, #fff, transparent),
+    radial-gradient(1px 1px at 33% 72%, rgba(255,255,255,.7), transparent),
+    radial-gradient(1px 1px at 57% 84%, #fff, transparent),
+    radial-gradient(2px 2px at 13% 52%, rgba(201,168,76,.5), transparent),
+    radial-gradient(2px 2px at 88% 43%, rgba(201,168,76,.5), transparent),
+    radial-gradient(1px 1px at 43% 28%, #fff, transparent),
+    radial-gradient(1px 1px at 78% 78%, rgba(255,255,255,.9), transparent),
+    radial-gradient(1px 1px at  4% 89%, #fff, transparent),
+    radial-gradient(1px 1px at 95% 15%, rgba(255,255,255,.8), transparent),
+    radial-gradient(1px 1px at 61% 44%, #fff, transparent);
+}
+
+/* ── SCREENS ──────────────────────────────────────────────────────────────── */
+.screen { display: none; position: relative; z-index: 1; min-height: 100vh; flex-direction: column; align-items: center; }
+.screen.active { display: flex; }
+
+/* ── LOGIN ────────────────────────────────────────────────────────────────── */
+#s-login {
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(ellipse at center top, #1a0a2e 0%, #0a0a0f 55%);
+}
+
+.crest { text-align: center; margin-bottom: 28px; }
+.crest-icon { font-size: 76px; display: block; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 0 22px rgba(201,168,76,.8)); }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.game-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(20px,4vw,40px);
+  color: var(--gold);
+  text-align: center;
+  text-shadow: 0 0 30px rgba(201,168,76,.6);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.game-sub {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(12px,2vw,16px);
+  color: var(--parch-d);
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 36px;
+}
+
+.login-box {
+  background: linear-gradient(135deg, rgba(20,10,40,.96), rgba(10,5,25,.96));
+  border: 2px solid var(--gold);
+  border-radius: 4px;
+  padding: 32px 36px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 0 40px rgba(201,168,76,.18), inset 0 0 30px rgba(0,0,0,.5);
+  position: relative;
+}
+.login-box::before { content:'✦'; position:absolute; top:10px; left:12px; color:var(--gold); opacity:.6; }
+.login-box::after  { content:'✦'; position:absolute; bottom:10px; right:12px; color:var(--gold); opacity:.6; }
+
+.login-title { font-family:'Cinzel',serif; font-size:18px; color:var(--gold); text-align:center; margin-bottom:22px; letter-spacing:2px; }
+
+.fgroup { margin-bottom:18px; }
+.fgroup label { display:block; font-family:'Cinzel',serif; font-size:12px; color:var(--parch-d); margin-bottom:7px; letter-spacing:1px; text-transform:uppercase; }
+.fgroup select, .fgroup input {
+  width:100%; padding:11px 14px;
+  background:rgba(245,230,200,.07); border:1px solid rgba(201,168,76,.35); border-radius:3px;
+  color:var(--parch); font-family:'IM Fell English',serif; font-size:15px; transition:all .25s; appearance:none;
+}
+.fgroup select:focus, .fgroup input:focus { outline:none; border-color:var(--gold); box-shadow:0 0 14px rgba(201,168,76,.28); background:rgba(245,230,200,.11); }
+.fgroup select option { background:#1a0a2e; }
+
+.btn-enter {
+  width:100%; padding:13px;
+  background: linear-gradient(135deg,#2d1a00,#5a3a00,#2d1a00);
+  border:2px solid var(--gold); border-radius:3px;
+  color:var(--gold); font-family:'Cinzel',serif; font-size:15px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:all .25s; margin-top:8px;
+}
+.btn-enter:hover { background:linear-gradient(135deg,#5a3a00,#8a5a00,#5a3a00); box-shadow:0 0 20px rgba(201,168,76,.45); transform:translateY(-2px); }
+
+.login-err { color:#ff6b6b; font-size:13px; text-align:center; margin-top:10px; display:none; font-style:italic; }
+
+/* ── SORTING HAT OVERLAY ──────────────────────────────────────────────────── */
+#sorting-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,.97);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+}
+#sorting-overlay.show { display: flex; }
+
+.hat-container { text-align: center; }
+.hat-icon {
+  font-size: 120px;
+  display: block;
+  animation: hatWobble 0.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(201,168,76,.9));
+  margin-bottom: 20px;
+}
+@keyframes hatWobble {
+  0%,100%{ transform: rotate(-8deg) scale(1); }
+  25%    { transform: rotate(8deg)  scale(1.05); }
+  50%    { transform: rotate(-5deg) scale(1.02); }
+  75%    { transform: rotate(5deg)  scale(1.04); }
+}
+.hat-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(22px,5vw,48px);
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(201,168,76,1);
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  animation: titlePulse 0.8s ease-in-out infinite;
+}
+@keyframes titlePulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.hat-sub {
+  font-family: 'Cinzel', serif; font-size: 14px;
+  color: var(--parch-d); letter-spacing: 3px; text-transform: uppercase;
+}
+
+/* Words flying from hat */
+.word-fly {
+  position: fixed;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(14px,2.5vw,22px);
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+  opacity: 0;
+  text-shadow: 0 0 10px currentColor;
+  animation: wordFly 1.2s ease-out forwards;
+}
+@keyframes wordFly {
+  0%   { opacity:0; transform: translate(0,0) scale(0.3) rotate(0deg); }
+  30%  { opacity:1; transform: translate(var(--tx30),var(--ty30)) scale(1.1) rotate(var(--rot30)); }
+  80%  { opacity:1; }
+  100% { opacity:0; transform: translate(var(--tx),var(--ty)) scale(0.8) rotate(var(--rot)); }
+}
+
+/* ── SHARED LAYOUT ────────────────────────────────────────────────────────── */
+.page-wrap { width:100%; max-width:1100px; margin:0 auto; padding:0 18px; }
+
+.page-header {
+  text-align:center; padding:18px 0 14px;
+  border-bottom:1px solid rgba(201,168,76,.25);
+  margin-bottom:22px;
+}
+.page-header h1 {
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(16px,3vw,28px);
+  color:var(--gold); text-shadow:0 0 20px rgba(201,168,76,.5);
+}
+.page-header .sub {
+  font-family:'Cinzel',serif; font-size:12px;
+  color:var(--parch-d); margin-top:4px; letter-spacing:2px;
+}
+
+.section-label {
+  font-family:'Cinzel',serif; font-size:14px; color:var(--gold);
+  letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:14px; padding-bottom:6px;
+  border-bottom:1px solid rgba(201,168,76,.18);
+}
+
+/* status bar */
+.status-bar {
+  background:rgba(245,230,200,.04); border:1px solid rgba(201,168,76,.18);
+  border-radius:4px; padding:12px 18px; margin-bottom:20px;
+  display:flex; gap:20px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+}
+.stat { text-align:center; }
+.stat-lbl { display:block; font-family:'Cinzel',serif; font-size:10px; color:var(--parch-d); letter-spacing:1px; text-transform:uppercase; }
+.stat-val { font-family:'Cinzel Decorative',serif; font-size:22px; color:var(--gold); }
+
+/* buttons */
+.btn {
+  padding:10px 22px; border:2px solid; border-radius:3px;
+  font-family:'Cinzel',serif; font-size:12px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all .25s;
+  background:transparent;
+}
+.btn-green  { border-color:#4CAF50; color:#4CAF50; } .btn-green:hover  { background:rgba(76,175,80,.18); box-shadow:0 0 14px rgba(76,175,80,.4); }
+.btn-amber  { border-color:#FFC107; color:#FFC107; } .btn-amber:hover  { background:rgba(255,193,7,.15); box-shadow:0 0 14px rgba(255,193,7,.4); }
+.btn-red    { border-color:#f44336; color:#f44336; } .btn-red:hover    { background:rgba(244,67,54,.15); box-shadow:0 0 14px rgba(244,67,54,.4); }
+.btn-gold   { border-color:var(--gold); color:var(--gold); } .btn-gold:hover  { background:rgba(201,168,76,.15); box-shadow:0 0 14px rgba(201,168,76,.4); }
+.btn-ghost  { border-color:rgba(201,168,76,.3); color:rgba(201,168,76,.5); font-size:11px; padding:7px 14px; }
+.btn-ghost:hover { border-color:rgba(201,168,76,.6); color:rgba(201,168,76,.8); }
+
+.btn-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+
+/* ── MASTER ───────────────────────────────────────────────────────────────── */
+#s-master { background:radial-gradient(ellipse at top, #130800 0%, #0a0a0f 55%); padding:16px; }
+
+.ranking-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+.ranking-table th { font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; color:var(--parch-d); text-align:left; padding:8px 10px; border-bottom:1px solid rgba(201,168,76,.2); }
+.ranking-table td { padding:9px 10px; border-bottom:1px solid rgba(255,255,255,.04); font-size:14px; }
+.ranking-table tr:hover td { background:rgba(255,255,255,.02); }
+
+.rank-pos { font-family:'Cinzel Decorative',serif; font-size:18px; color:var(--gold); opacity:.5; text-align:center!important; }
+.rank-pos.top { opacity:1; }
+.solved-check { color:#4CAF50; font-size:18px; }
+.attempts-val { font-family:'Cinzel',serif; font-size:13px; color:var(--parch-d); }
+
+.house-tag {
+  font-family:'Cinzel',serif; font-size:11px;
+  padding:3px 10px; border-radius:12px; letter-spacing:1px; display:inline-block;
+}
+.ht-Corvinal   { color:var(--rave-s);  background:rgba(14,26,64,.4);   border:1px solid rgba(14,26,64,.7); }
+.ht-Grifinória { color:var(--gryff-g); background:rgba(116,0,1,.3);    border:1px solid rgba(116,0,1,.6); }
+.ht-Lufa-Lufa  { color:var(--huff-y);  background:rgba(236,185,57,.1); border:1px solid rgba(236,185,57,.35); }
+.ht-Sonserina  { color:var(--slyt-s);  background:rgba(26,71,42,.3);   border:1px solid rgba(26,71,42,.6); }
+
+/* house score cards */
+.houses-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+@media(max-width:600px){ .houses-row { grid-template-columns:repeat(2,1fr); } }
+
+.house-score-card { border-radius:4px; padding:14px 12px; text-align:center; border:1px solid; }
+.house-score-card.hc-Corvinal   { background:rgba(14,26,64,.25);   border-color:rgba(14,26,64,.6); }
+.house-score-card.hc-Grifinória { background:rgba(116,0,1,.2);    border-color:rgba(116,0,1,.5); }
+.house-score-card.hc-Lufa-Lufa  { background:rgba(236,185,57,.08); border-color:rgba(236,185,57,.3); }
+.house-score-card.hc-Sonserina  { background:rgba(26,71,42,.2);   border-color:rgba(26,71,42,.5); }
+
+.hsc-name { font-family:'Cinzel',serif; font-size:12px; font-weight:700; letter-spacing:1px; margin-bottom:8px; }
+.hsc-Corvinal   .hsc-name { color:var(--rave-s); }
+.hsc-Grifinória .hsc-name { color:var(--gryff-g); }
+.hsc-Lufa-Lufa  .hsc-name { color:var(--huff-y); }
+.hsc-Sonserina  .hsc-name { color:var(--slyt-s); }
+
+.hsc-count { font-family:'Cinzel Decorative',serif; font-size:28px; color:var(--gold); }
+.hsc-sub   { font-size:11px; color:var(--parch-d); }
+
+/* ── PLAYER ───────────────────────────────────────────────────────────────── */
+#s-player { background:radial-gradient(ellipse at top, #130800 0%, #0a0a0f 60%); padding:0; }
+
+.player-topbar { text-align:center; padding:16px 20px; position:relative; }
+.player-topbar.hb-Corvinal   { background:linear-gradient(180deg,rgba(14,26,64,.5) 0%,transparent 100%); }
+.player-topbar.hb-Grifinória { background:linear-gradient(180deg,rgba(116,0,1,.5) 0%,transparent 100%); }
+.player-topbar.hb-Lufa-Lufa  { background:linear-gradient(180deg,rgba(236,185,57,.2) 0%,transparent 100%); }
+.player-topbar.hb-Sonserina  { background:linear-gradient(180deg,rgba(26,71,42,.5) 0%,transparent 100%); }
+
+.player-name-lbl { font-family:'Cinzel',serif; font-size:12px; color:var(--parch-d); letter-spacing:2px; margin-bottom:4px; }
+.player-house-lbl {
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(18px,4vw,30px);
+}
+.player-house-lbl.hc-Corvinal   { color:var(--rave-s); }
+.player-house-lbl.hc-Grifinória { color:var(--gryff-g); }
+.player-house-lbl.hc-Lufa-Lufa  { color:var(--huff-y); }
+.player-house-lbl.hc-Sonserina  { color:var(--slyt-s); }
+
+.player-body { flex:1; padding:16px 18px; display:flex; flex-direction:column; align-items:center; }
+
+/* waiting */
+.wait-box { text-align:center; padding:60px 20px; }
+.wait-icon { font-size:64px; animation:spin 8s linear infinite; display:block; margin-bottom:18px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.wait-text { font-style:italic; font-size:17px; color:var(--parch-d); margin-bottom:8px; }
+.wait-sub  { font-family:'Cinzel',serif; font-size:11px; color:rgba(196,168,130,.5); letter-spacing:2px; }
+
+/* paused */
+.pause-box { text-align:center; padding:60px 20px; }
+
+/* word grid */
+.word-grid-container { width:100%; max-width:760px; }
+
+.word-grid-header {
+  text-align:center; margin-bottom:16px;
+}
+.wg-instruction {
+  font-family:'Cinzel',serif; font-size:13px; color:var(--parch-d);
+  letter-spacing:1px; margin-bottom:6px;
+}
+.wg-count {
+  font-family:'Cinzel Decorative',serif; font-size:26px; color:var(--gold);
+}
+
+.word-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.word-card {
+  padding:14px 10px;
+  border-radius:4px;
+  text-align:center;
+  cursor:pointer;
+  border:2px solid rgba(201,168,76,.2);
+  background:rgba(245,230,200,.04);
+  font-family:'Cinzel',serif;
+  font-size:clamp(12px,2vw,15px);
+  letter-spacing:1px;
+  color:var(--parch-d);
+  transition:all .2s;
+  user-select:none;
+  position:relative;
+  overflow:hidden;
+}
+.word-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(201,168,76,.15), transparent 70%);
+  opacity:0; transition:opacity .2s;
+}
+.word-card:hover { border-color:rgba(201,168,76,.5); color:var(--parch); transform:translateY(-2px); }
+.word-card:hover::before { opacity:1; }
+
+.word-card.selected {
+  border-color:var(--gold);
+  background:rgba(201,168,76,.12);
+  color:var(--gold);
+  box-shadow:0 0 14px rgba(201,168,76,.3);
+}
+.word-card.selected::before { opacity:1; }
+
+.word-card.hovered-Corvinal   { border-color:rgba(155,176,211,.6); color:var(--rave-s); }
+.word-card.hovered-Grifinória { border-color:rgba(211,166,37,.6);  color:var(--gryff-g); }
+.word-card.hovered-Lufa-Lufa  { border-color:rgba(236,185,57,.6);  color:var(--huff-y); }
+.word-card.hovered-Sonserina  { border-color:rgba(170,170,170,.6); color:var(--slyt-s); }
+
+.word-card.selected.hc-Corvinal   { border-color:var(--rave-s);  background:rgba(14,26,64,.35);   color:var(--rave-s);  box-shadow:0 0 14px rgba(155,176,211,.4); }
+.word-card.selected.hc-Grifinória { border-color:var(--gryff-g); background:rgba(116,0,1,.3);     color:var(--gryff-g); box-shadow:0 0 14px rgba(211,166,37,.4); }
+.word-card.selected.hc-Lufa-Lufa  { border-color:var(--huff-y);  background:rgba(236,185,57,.12); color:var(--huff-y);  box-shadow:0 0 14px rgba(236,185,57,.4); }
+.word-card.selected.hc-Sonserina  { border-color:var(--slyt-s);  background:rgba(26,71,42,.3);    color:var(--slyt-s);  box-shadow:0 0 14px rgba(170,170,170,.35); }
+
+/* submit button */
+.btn-submit-wrap { text-align:center; margin-bottom:20px; }
+.btn-submit {
+  padding:16px 48px;
+  font-family:'Cinzel',serif; font-size:16px; font-weight:700; letter-spacing:3px;
+  text-transform:uppercase; border-radius:6px; cursor:pointer; transition:all .25s;
+  border:2px solid; width:100%; max-width:400px;
+}
+.btn-submit:disabled { opacity:.35; cursor:not-allowed; }
+.btn-submit.hc-Corvinal   { color:var(--rave-s);  border-color:var(--rave-s);  background:rgba(14,26,64,.3); }
+.btn-submit.hc-Grifinória { color:var(--gryff-g); border-color:var(--gryff-g); background:rgba(116,0,1,.25); }
+.btn-submit.hc-Lufa-Lufa  { color:var(--huff-y);  border-color:var(--huff-y);  background:rgba(55,46,41,.4); }
+.btn-submit.hc-Sonserina  { color:var(--slyt-s);  border-color:var(--slyt-s);  background:rgba(26,71,42,.3); }
+
+.btn-submit:not(:disabled):hover { transform:translateY(-2px); }
+.btn-submit.hc-Corvinal:not(:disabled):hover   { box-shadow:0 0 24px rgba(155,176,211,.5); }
+.btn-submit.hc-Grifinória:not(:disabled):hover { box-shadow:0 0 24px rgba(211,166,37,.5); }
+.btn-submit.hc-Lufa-Lufa:not(:disabled):hover  { box-shadow:0 0 24px rgba(236,185,57,.4); }
+.btn-submit.hc-Sonserina:not(:disabled):hover  { box-shadow:0 0 24px rgba(170,170,170,.4); }
+
+/* attempt result flash */
+.attempt-feedback {
+  text-align:center; margin-bottom:16px; min-height:36px;
+  font-family:'Cinzel',serif; font-size:14px; letter-spacing:1px;
+}
+.feedback-wrong { color:#ff6b6b; }
+.feedback-ok    { color:#4CAF50; }
+
+/* ── SPECTATOR ────────────────────────────────────────────────────────────── */
+#s-spectator { background:radial-gradient(ellipse at top, #0f0800 0%, #0a0a0f 55%); padding:16px; }
+
+.live-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'Cinzel',serif; font-size:11px; color:#ff6b6b; letter-spacing:2px;
+}
+.live-dot { width:7px; height:7px; background:#ff6b6b; border-radius:50%; animation:livePulse 1s ease-in-out infinite; }
+@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+
+.spec-ranking { list-style:none; margin-bottom:24px; }
+.spec-rank-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 14px; margin-bottom:5px; border-radius:4px;
+  background:rgba(245,230,200,.03); border:1px solid rgba(201,168,76,.08);
+  transition:all .4s;
+}
+.spec-rank-item.is-winner { background:rgba(201,168,76,.1); border-color:rgba(201,168,76,.4); box-shadow:0 0 16px rgba(201,168,76,.15); }
+.spec-rank-item.is-first  { background:rgba(201,168,76,.07); border-color:rgba(201,168,76,.25); }
+
+.srank-pos { font-family:'Cinzel Decorative',serif; font-size:18px; color:var(--gold); opacity:.45; width:32px; text-align:center; flex-shrink:0; }
+.srank-pos.top { opacity:1; color:#FFD700; }
+.srank-info { flex:1; min-width:0; }
+.srank-name { font-family:'Cinzel',serif; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.srank-house { font-size:11px; color:var(--parch-d); font-style:italic; }
+.srank-right { text-align:right; flex-shrink:0; }
+.srank-score { font-family:'Cinzel Decorative',serif; font-size:22px; color:var(--gold); }
+.srank-att   { font-size:11px; color:var(--parch-d); }
+
+.spec-word-box {
+  text-align:center; padding:24px 20px; margin-bottom:22px;
+}
+.spec-word-label { font-family:'Cinzel',serif; font-size:11px; color:var(--parch-d); letter-spacing:3px; margin-bottom:10px; text-transform:uppercase; }
+.spec-word {
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(16px,4vw,28px);
+  color:var(--gold);
+  text-shadow:0 0 30px rgba(201,168,76,.7);
+  letter-spacing:4px;
+}
+
+/* ── WINNER ───────────────────────────────────────────────────────────────── */
+#s-winner {
+  justify-content:center;
+  background:radial-gradient(ellipse at center, #2d1600 0%, #0a0a0f 60%);
+  padding:20px;
+}
+.winner-wrap { text-align:center; max-width:560px; }
+.win-icon { font-size:88px; display:block; animation:winFloat 2s ease-in-out infinite; margin-bottom:16px; }
+@keyframes winFloat { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-14px) rotate(4deg)} }
+.win-title {
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(22px,5vw,48px);
+  color:var(--gold);
+  text-shadow:0 0 40px rgba(201,168,76,.9);
+  margin-bottom:8px;
+}
+.win-name { font-family:'Cinzel',serif; font-size:clamp(18px,4vw,34px); margin-bottom:16px; color:var(--parch); }
+.win-house {
+  font-family:'Cinzel Decorative',serif; font-size:clamp(14px,3vw,22px);
+  padding:9px 24px; border:2px solid; border-radius:4px; display:inline-block; margin-bottom:24px;
+}
+.win-house.hc-Corvinal   { color:var(--rave-s);  border-color:var(--rave-s); }
+.win-house.hc-Grifinória { color:var(--gryff-g); border-color:var(--gryff-g); }
+.win-house.hc-Lufa-Lufa  { color:var(--huff-y);  border-color:var(--huff-y); }
+.win-house.hc-Sonserina  { color:var(--slyt-s);  border-color:var(--slyt-s); }
+.win-quote { font-style:italic; font-size:16px; color:var(--parch-d); margin-bottom:28px; }
+.win-attempts { font-family:'Cinzel',serif; font-size:13px; color:var(--parch-d); margin-bottom:20px; letter-spacing:1px; }
+
+/* confetti */
+.confetti-area { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:998; }
+.cf { position:absolute; border-radius:50%; animation:cfFall linear infinite; }
+@keyframes cfFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(105vh) rotate(720deg);opacity:0} }
+
+/* toast */
+.toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:rgba(18,8,36,.96); border:1px solid var(--gold);
+  border-radius:4px; padding:11px 22px;
+  font-family:'Cinzel',serif; font-size:13px; color:var(--gold); letter-spacing:1px;
+  z-index:2000; transition:transform .35s ease; max-width:90vw; text-align:center;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
+::-webkit-scrollbar-thumb { background:rgba(201,168,76,.25); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<!-- confetti -->
+<div class="confetti-area" id="confetti-area"></div>
+
+<!-- sorting hat overlay -->
+<div id="sorting-overlay">
+  <div class="hat-container">
+    <span class="hat-icon">🎩</span>
+    <div class="hat-title">O Chapéu Seletor!</div>
+    <div class="hat-sub">As palavras estão sendo reveladas...</div>
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════ LOGIN ═══════════════════════ -->
+<div id="s-login" class="screen active">
+  <div class="crest">
+    <span class="crest-icon">⚡</span>
+  </div>
+  <h1 class="game-title">Torneio das Casas</h1>
+  <p class="game-sub">Hogwarts School of Witchcraft and Wizardry</p>
+
+  <div class="login-box">
+    <h2 class="login-title">✦ Identificação ✦</h2>
+
+    <div class="fgroup">
+      <label>Tipo de Acesso</label>
+      <select id="login-type" onchange="onLoginTypeChange()">
+        <option value="">— Selecione —</option>
+        <option value="master">🔮 Mestre do Jogo</option>
+        <option value="spectator">👁️ Espectador</option>
+        <option value="player">⚡ Participante</option>
+      </select>
+    </div>
+
+    <div class="fgroup" id="grp-player" style="display:none">
+      <label>Seu Nome</label>
+      <select id="sel-player"><option value="">— Selecione seu nome —</option></select>
+    </div>
+
+    <div class="fgroup" id="grp-password" style="display:none">
+      <label id="pw-label">Senha</label>
+      <input type="password" id="inp-password" placeholder="••••••••">
+    </div>
+
+    <button class="btn-enter" onclick="doLogin()">Entrar em Hogwarts</button>
+    <p class="login-err" id="login-err">⚠ Acesso negado, feiticeiro desconhecido</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MASTER ═══════════════════════ -->
+<div id="s-master" class="screen">
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>🔮 Painel do Mestre</h1>
+      <p class="sub">Controle do Torneio das Casas</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="masterCmd('start')">▶ Iniciar / Revelar</button>
+      <button class="btn btn-amber" onclick="masterCmd('pause')">⏸ Pausar / Retomar</button>
+      <button class="btn btn-red"   onclick="masterCmd('reset')">↺ Reiniciar</button>
+    </div>
+
+    <div class="status-bar">
+      <div class="stat"><span class="stat-lbl">Status</span>   <span class="stat-val" id="m-status">—</span></div>
+      <div class="stat"><span class="stat-lbl">Conectados</span><span class="stat-val" id="m-conn">0</span></div>
+      <div class="stat"><span class="stat-lbl">Finalizados</span><span class="stat-val" id="m-solved">0</span></div>
+      <div class="stat"><span class="stat-lbl">Líder</span>     <span class="stat-val" id="m-leader" style="font-size:14px">—</span></div>
+    </div>
+
+    <!-- house score cards -->
+    <p class="section-label">🏰 Pontuação por Casa</p>
+    <div class="houses-row" id="m-houses-row"></div>
+
+    <!-- ranking -->
+    <p class="section-label">📊 Ranking</p>
+    <table class="ranking-table">
+      <thead><tr>
+        <th style="width:40px">#</th>
+        <th>Participante</th>
+        <th>Casa</th>
+        <th>Tentativas</th>
+        <th>Status</th>
+      </tr></thead>
+      <tbody id="m-ranking-body"></tbody>
+    </table>
+
+    <div style="text-align:center;margin-bottom:30px">
+      <button class="btn btn-ghost" onclick="logout()">Sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PLAYER ═══════════════════════ -->
+<div id="s-player" class="screen">
+  <div class="player-topbar" id="p-topbar">
+    <p class="player-name-lbl" id="p-name-lbl">—</p>
+    <div class="player-house-lbl" id="p-house-lbl">—</div>
+  </div>
+
+  <div class="player-body">
+    <!-- waiting -->
+    <div class="wait-box" id="p-wait">
+      <span class="wait-icon">⚗️</span>
+      <p class="wait-text">Aguardando o Mestre iniciar o sortilégio...</p>
+      <p class="wait-sub">MANTENHA SEU CAJADO PRONTO</p>
+    </div>
+
+    <!-- paused -->
+    <div class="pause-box" id="p-pause" style="display:none;text-align:center;padding:60px 20px">
+      <span style="font-size:56px">⏸</span>
+      <p style="font-family:'Cinzel',serif;color:var(--parch-d);letter-spacing:2px;margin-top:14px">JOGO PAUSADO</p>
+    </div>
+
+    <!-- solved -->
+    <div id="p-solved" style="display:none;text-align:center;padding:60px 20px">
+      <span style="font-size:70px">✨</span>
+      <p style="font-family:'Cinzel Decorative',serif;font-size:28px;color:var(--gold);margin-top:16px">Parabéns!</p>
+      <p style="font-family:'Cinzel',serif;font-size:15px;color:var(--parch-d);margin-top:10px">Você identificou todas as palavras da sua casa!</p>
+    </div>
+
+    <!-- game area -->
+    <div id="p-game" style="display:none;width:100%">
+      <div class="word-grid-container">
+        <div class="word-grid-header">
+          <p class="wg-instruction">Selecione as 10 palavras que pertencem à sua casa</p>
+          <div class="wg-count"><span id="p-sel-count">0</span> / 10 selecionadas</div>
+        </div>
+
+        <div class="attempt-feedback" id="p-feedback"></div>
+
+        <div class="word-grid" id="p-word-grid"></div>
+
+        <div class="btn-submit-wrap">
+          <button class="btn-submit" id="p-submit-btn" disabled onclick="playerSubmit()">
+            ⚡ Confirmar Seleção ⚡
+          </button>
+        </div>
+        <p style="text-align:center;font-family:'Cinzel',serif;font-size:12px;color:rgba(196,168,130,.5);letter-spacing:1px;margin-bottom:10px">
+          Tentativas: <span id="p-attempts">0</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:12px">
+    <button class="btn btn-ghost" onclick="logout()">Sair</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SPECTATOR ═══════════════════════ -->
+<div id="s-spectator" class="screen">
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>Torneio das Casas de Hogwarts</h1>
+      <p class="sub"><span class="live-badge"><span class="live-dot"></span> AO VIVO</span></p>
+    </div>
+
+    <!-- house standings -->
+    <p class="section-label">🏆 Casas</p>
+    <div class="houses-row" id="sp-houses-row"></div>
+
+    <!-- current activity -->
+    <div class="spec-word-box">
+      <p class="spec-word-label">Status do Jogo</p>
+      <div class="spec-word" id="sp-status-word">Aguardando início</div>
+    </div>
+
+    <!-- ranking top 20 -->
+    <p class="section-label">📊 Ranking</p>
+    <ul class="spec-ranking" id="sp-ranking"></ul>
+
+    <div style="text-align:center;margin-bottom:30px">
+      <button class="btn btn-ghost" onclick="logout()">Sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ WINNER ═══════════════════════ -->
+<div id="s-winner" class="screen">
+  <div class="winner-wrap">
+    <span class="win-icon">🏆</span>
+    <h1 class="win-title">VENCEDOR!</h1>
+    <p class="win-name" id="w-name">—</p>
+    <div class="win-house" id="w-house">—</div>
+    <p class="win-attempts" id="w-attempts"></p>
+    <p class="win-quote">"Palavras são, na minha humilde opinião, nossa fonte mais inesgotável de magia."</p>
+    <button class="btn btn-gold" onclick="logout()">↺ Voltar ao início</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCRIPT ═══════════════════════════════ -->
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const HOUSE_EMOJIS = { 'Corvinal':'🦅','Grifinória':'🦁','Lufa-Lufa':'🦡','Sonserina':'🐍' };
+const HOUSE_CSS    = { 'Corvinal':'Corvinal','Grifinória':'Grifinória','Lufa-Lufa':'Lufa-Lufa','Sonserina':'Sonserina' };
+const STATUS_MAP   = { waiting:'Aguardando',sorting:'Sortilégio',active:'Em Jogo',paused:'Pausado',finished:'Encerrado' };
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let ws = null;
+let me = null;           // { role, name, house }
+let gameState = null;    // latest state from server
+let selectedWords = new Set();
+let participants = {};   // loaded from /api/config
+
+// ── WS ────────────────────────────────────────────────────────────────────
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}`);
+
+  ws.onopen    = () => console.log('WS connected');
+  ws.onclose   = () => { setTimeout(connectWS, 2000); };
+  ws.onerror   = (e) => console.error('WS error', e);
+  ws.onmessage = (ev) => handleMessage(JSON.parse(ev.data));
+}
+
+function send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+}
+
+function handleMessage(msg) {
+  switch (msg.type) {
+
+    case 'auth_ok':
+      me.role = msg.role;
+      if (msg.name)  me.name  = msg.name;
+      if (msg.house) me.house = msg.house;
+      showScreenForRole();
+      break;
+
+    case 'auth_error':
+      document.getElementById('login-err').style.display = 'block';
+      document.getElementById('login-err').textContent = '⚠ ' + msg.message;
+      break;
+
+    case 'state':
+      gameState = msg.data;
+      renderAll();
+      // Check if finished and I'm involved
+      if (gameState.status === 'finished' && gameState.winner) {
+        if (me && (me.role === 'spectator' || me.role === 'master' ||
+            (me.role === 'player' && me.name === gameState.winner.name))) {
+          showWinnerScreen(gameState.winner);
+        }
+      }
+      break;
+
+    case 'sorting_hat':
+      triggerSortingHat();
+      break;
+
+    case 'submit_result':
+      handleSubmitResult(msg);
+      break;
+
+    case 'connected_count':
+      document.getElementById('m-conn').textContent = msg.count;
+      break;
+  }
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────────────────
+async function loadConfig() {
+  const cfg = await fetch('/api/config').then(r => r.json());
+  participants = cfg.participants;
+  const sel = document.getElementById('sel-player');
+  const all = [];
+  Object.entries(participants).forEach(([house, ps]) => ps.forEach(p => all.push({ name:p, house })));
+  all.sort((a,b) => a.name.localeCompare(b.name));
+  all.forEach(p => {
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ name:p.name, house:p.house });
+    o.textContent = `${p.name} (${p.house})`;
+    sel.appendChild(o);
+  });
+  return cfg;
+}
+
+function onLoginTypeChange() {
+  const t = document.getElementById('login-type').value;
+  document.getElementById('grp-player').style.display   = t==='player'    ? 'block':'none';
+  document.getElementById('grp-password').style.display = (t==='master'||t==='spectator') ? 'block':'none';
+  document.getElementById('pw-label').textContent = t==='master' ? 'Senha do Mestre' : 'Senha do Espectador';
+}
+
+function doLogin() {
+  const type = document.getElementById('login-type').value;
+  const err  = document.getElementById('login-err');
+  err.style.display = 'none';
+  if (!type) { err.style.display='block'; err.textContent='⚠ Selecione o tipo de acesso'; return; }
+
+  me = { role: type };
+
+  if (type === 'master') {
+    me.name = 'Mestre';
+    send({ type:'auth', role:'master', password: document.getElementById('inp-password').value });
+
+  } else if (type === 'spectator') {
+    me.name = 'Espectador';
+    send({ type:'auth', role:'spectator', password: document.getElementById('inp-password').value });
+
+  } else {
+    const val = document.getElementById('sel-player').value;
+    if (!val) { err.style.display='block'; err.textContent='⚠ Selecione seu nome'; return; }
+    const data = JSON.parse(val);
+    me = { role:'player', name:data.name, house:data.house };
+    send({ type:'auth', role:'player', name:data.name });
+  }
+}
+
+function showScreenForRole() {
+  if (!me) return;
+  if (me.role==='master')    { showScreen('s-master');    initMasterUI(); }
+  else if (me.role==='spectator') { showScreen('s-spectator'); }
+  else if (me.role==='player')    { showScreen('s-player');    initPlayerUI(); }
+}
+
+function logout() {
+  me = null; gameState = null; selectedWords.clear();
+  showScreen('s-login');
+  document.getElementById('login-type').value = '';
+  document.getElementById('grp-player').style.display = 'none';
+  document.getElementById('grp-password').style.display = 'none';
+  document.getElementById('inp-password').value = '';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── SORTING HAT ANIMATION ──────────────────────────────────────────────────
+function triggerSortingHat() {
+  const overlay = document.getElementById('sorting-overlay');
+  overlay.classList.add('show');
+
+  // Sample words to fly
+  const sampleWords = ['Coragem','Sabedoria','Ambição','Amizade','Bravura','Astúcia',
+    'Lealdade','Erudição','Heroísmo','Poder','Dedicação','Conhecimento'];
+  const colors = ['#D3A625','#9BB0D3','#AAAAAA','#ECB939','#C9A84C','#fff'];
+
+  const cx = window.innerWidth  / 2;
+  const cy = window.innerHeight / 2;
+
+  sampleWords.forEach((word, i) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'word-fly';
+      el.textContent = word;
+      el.style.left = cx + 'px';
+      el.style.top  = cy + 'px';
+      el.style.color = colors[i % colors.length];
+
+      const angle = (i / sampleWords.length) * 360;
+      const dist  = 200 + Math.random() * 200;
+      const rad   = angle * Math.PI / 180;
+      const tx = Math.cos(rad) * dist;
+      const ty = Math.sin(rad) * dist;
+      const tx30 = Math.cos(rad) * dist * 0.4;
+      const ty30 = Math.sin(rad) * dist * 0.4;
+      const rot  = (Math.random() - 0.5) * 60;
+      const rot30= (Math.random() - 0.5) * 20;
+
+      el.style.setProperty('--tx',   `${tx}px`);
+      el.style.setProperty('--ty',   `${ty}px`);
+      el.style.setProperty('--tx30', `${tx30}px`);
+      el.style.setProperty('--ty30', `${ty30}px`);
+      el.style.setProperty('--rot',  `${rot}deg`);
+      el.style.setProperty('--rot30',`${rot30}deg`);
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1400);
+    }, i * 200);
+  });
+
+  // Hide overlay after server sends state (4s)
+  setTimeout(() => overlay.classList.remove('show'), 3800);
+}
+
+// ── RENDER ALL ─────────────────────────────────────────────────────────────
+function renderAll() {
+  if (!gameState) return;
+  if (me?.role === 'master')    renderMaster();
+  if (me?.role === 'spectator') renderSpectator();
+  if (me?.role === 'player')    renderPlayer();
+}
+
+// ── MASTER ─────────────────────────────────────────────────────────────────
+function initMasterUI() { if (gameState) renderMaster(); }
+
+function renderMaster() {
+  const s = gameState;
+  document.getElementById('m-status').textContent  = STATUS_MAP[s.status] || s.status;
+  document.getElementById('m-conn').textContent    = s.connectedCount;
+  const total = s.ranking.filter(r=>r.solved).length;
+  document.getElementById('m-solved').textContent  = total;
+
+  const top = s.ranking[0];
+  document.getElementById('m-leader').textContent  = top ? `${top.name.split(' ')[0]}` : '—';
+
+  // house cards
+  const housesRow = document.getElementById('m-houses-row');
+  housesRow.innerHTML = Object.keys(HOUSE_EMOJIS).map(h => `
+    <div class="house-score-card hsc-${h} hc-${h}">
+      <div class="hsc-name">${HOUSE_EMOJIS[h]} ${h}</div>
+      <div class="hsc-count">${s.houseSolved[h]||0}</div>
+      <div class="hsc-sub">finalizados</div>
+    </div>
+  `).join('');
+
+  // ranking table
+  const tbody = document.getElementById('m-ranking-body');
+  tbody.innerHTML = s.ranking.map((r,i) => `
+    <tr>
+      <td class="rank-pos ${i<3?'top':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+      <td>${r.name}</td>
+      <td><span class="house-tag ht-${r.house}">${HOUSE_EMOJIS[r.house]} ${r.house}</span></td>
+      <td class="attempts-val">${r.attempts}</td>
+      <td>${r.solved ? '<span class="solved-check">✓</span>' : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function masterCmd(cmd) {
+  if (cmd==='start') send({ type:'master_start' });
+  else if (cmd==='pause') send({ type:'master_pause' });
+  else if (cmd==='reset') { if (confirm('Reiniciar o jogo? Todos os dados serão perdidos.')) send({ type:'master_reset' }); }
+}
+
+// ── PLAYER ─────────────────────────────────────────────────────────────────
+function initPlayerUI() {
+  const css = me.house;
+  document.getElementById('p-topbar').className    = `player-topbar hb-${css}`;
+  document.getElementById('p-name-lbl').textContent = me.name;
+  const hl = document.getElementById('p-house-lbl');
+  hl.textContent  = `${HOUSE_EMOJIS[me.house]} ${me.house}`;
+  hl.className    = `player-house-lbl hc-${css}`;
+  // style submit btn
+  document.getElementById('p-submit-btn').className = `btn-submit hc-${css}`;
+  if (gameState) renderPlayer();
+}
+
+function renderPlayer() {
+  const s = gameState;
+  const myS = s.myState || { selected:[], attempts:0, solved:false };
+
+  // Check if I'm the winner
+  if (s.status==='finished' && s.winner && s.winner.name===me.name) {
+    showWinnerScreen(s.winner); return;
+  }
+
+  // Update attempts
+  document.getElementById('p-attempts').textContent = myS.attempts;
+
+  if (myS.solved) {
+    show('p-solved'); hide('p-wait'); hide('p-pause'); hide('p-game'); return;
+  }
+
+  if (s.status==='waiting') {
+    show('p-wait'); hide('p-pause'); hide('p-game'); return;
+  }
+  if (s.status==='paused') {
+    show('p-pause'); hide('p-wait'); hide('p-game'); return;
+  }
+  if (s.status==='active' || s.status==='finished') {
+    hide('p-wait'); hide('p-pause'); hide('p-solved'); show('p-game');
+    buildWordGrid(s.words);
+  }
+}
+
+function buildWordGrid(words) {
+  const grid = document.getElementById('p-word-grid');
+  if (grid.dataset.built === 'true') {
+    updateSelectionUI(); return;
+  }
+  grid.dataset.built = 'true';
+  grid.innerHTML = '';
+  words.forEach(({ word }) => {
+    const card = document.createElement('div');
+    card.className = 'word-card';
+    card.textContent = word;
+    card.dataset.word = word;
+    card.onclick = () => toggleWord(card, word);
+    grid.appendChild(card);
+  });
+  updateSelectionUI();
+}
+
+function toggleWord(card, word) {
+  if (selectedWords.has(word)) {
+    selectedWords.delete(word);
+    card.classList.remove('selected', `hc-${me.house}`);
+  } else {
+    if (selectedWords.size >= 10) { showToast('Você já selecionou 10 palavras!'); return; }
+    selectedWords.add(word);
+    card.classList.add('selected', `hc-${me.house}`);
+  }
+  updateSelectionUI();
+}
+
+function updateSelectionUI() {
+  const count = selectedWords.size;
+  document.getElementById('p-sel-count').textContent = count;
+  const btn = document.getElementById('p-submit-btn');
+  btn.disabled = count !== 10;
+  // sync card states
+  document.querySelectorAll('.word-card').forEach(c => {
+    const w = c.dataset.word;
+    if (selectedWords.has(w)) {
+      c.classList.add('selected', `hc-${me.house}`);
+    } else {
+      c.classList.remove('selected', `hc-${me.house}`);
+    }
+  });
+}
+
+function playerSubmit() {
+  if (selectedWords.size !== 10) return;
+  send({ type:'player_submit', selected:[...selectedWords] });
+  document.getElementById('p-submit-btn').disabled = true;
+}
+
+function handleSubmitResult(msg) {
+  const fb = document.getElementById('p-feedback');
+  if (msg.correct) {
+    fb.innerHTML = '<span class="feedback-ok">✨ Correto! Parabéns!</span>';
+  } else {
+    selectedWords.clear();
+    // Reset grid built flag so it can resync
+    const grid = document.getElementById('p-word-grid');
+    grid.querySelectorAll('.word-card').forEach(c => c.classList.remove('selected',`hc-${me.house}`));
+    updateSelectionUI();
+    fb.innerHTML = `<span class="feedback-wrong">✗ Não foi desta vez... Tente novamente! (${msg.attempts} tentativa${msg.attempts>1?'s':''})</span>`;
+    document.getElementById('p-submit-btn').disabled = false;
+    showToast('❌ Seleção incorreta — tente novamente!');
+  }
+}
+
+// ── SPECTATOR ──────────────────────────────────────────────────────────────
+function renderSpectator() {
+  const s = gameState;
+
+  // status word
+  const sw = document.getElementById('sp-status-word');
+  if (s.status==='waiting')  sw.textContent = '⏳ Aguardando início...';
+  else if (s.status==='sorting')  sw.textContent = '🎩 Sortilégio em curso...';
+  else if (s.status==='active')   sw.textContent = '⚡ Jogo em andamento!';
+  else if (s.status==='paused')   sw.textContent = '⏸ Jogo pausado';
+  else if (s.status==='finished') sw.textContent = `🏆 ${s.winner?.name} venceu!`;
+
+  // house cards
+  document.getElementById('sp-houses-row').innerHTML = Object.keys(HOUSE_EMOJIS).map(h => `
+    <div class="house-score-card hsc-${h} hc-${h}">
+      <div class="hsc-name">${HOUSE_EMOJIS[h]} ${h}</div>
+      <div class="hsc-count">${s.houseSolved[h]||0}</div>
+      <div class="hsc-sub">finalizados</div>
+    </div>
+  `).join('');
+
+  // ranking top 20
+  document.getElementById('sp-ranking').innerHTML = s.ranking.slice(0,20).map((r,i) => `
+    <li class="spec-rank-item ${r.solved?'is-winner':''} ${i===0&&!r.solved?'is-first':''}">
+      <div class="srank-pos ${i<3?'top':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="srank-info">
+        <div class="srank-name">${r.name}</div>
+        <div class="srank-house">${HOUSE_EMOJIS[r.house]} ${r.house}</div>
+      </div>
+      <div class="srank-right">
+        <div class="srank-score">${r.solved?'✓':r.attempts}</div>
+        <div class="srank-att">${r.solved?'Finalizado':r.attempts+' tent.'}</div>
+      </div>
+    </li>
+  `).join('');
+}
+
+// ── WINNER ──────────────────────────────────────────────────────────────────
+function showWinnerScreen(winner) {
+  document.getElementById('w-name').textContent    = winner.name;
+  const wh = document.getElementById('w-house');
+  wh.textContent = `${HOUSE_EMOJIS[winner.house]} ${winner.house}`;
+  wh.className = `win-house hc-${winner.house}`;
+  document.getElementById('w-attempts').textContent =
+    `Acertou em ${winner.attempts} tentativa${winner.attempts>1?'s':''}`;
+  showScreen('s-winner');
+  spawnConfetti();
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────────────────────
+function spawnConfetti() {
+  const area = document.getElementById('confetti-area');
+  const colors=['#D3A625','#740001','#0E1A40','#ECB939','#1A472A','#FFD700','#fff','#ff6b6b'];
+  for (let i=0;i<90;i++) {
+    const p=document.createElement('div');
+    p.className='cf';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    const sz=(Math.random()*8+4)+'px';
+    p.style.width=sz; p.style.height=sz;
+    p.style.animationDuration=(Math.random()*3+2)+'s';
+    p.style.animationDelay=(Math.random()*2)+'s';
+    p.style.borderRadius=Math.random()>.5?'50%':'0';
+    area.appendChild(p);
+    setTimeout(()=>p.remove(),7000);
+  }
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function show(id) { document.getElementById(id).style.display=''; }
+function hide(id) { document.getElementById(id).style.display='none'; }
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadConfig();
+connectWS();
+</script>
+</body>
+</html>
