@@ -740,7 +740,7 @@ function handleMessage(msg) {
       handleSubmitResult(msg);
       break;
 
-    case 'game_reset':
+    case 'game_reset': {
       // Master reset — clear local state and take everyone back to their screen
       selectedWords.clear();
       gameState = null;
@@ -753,6 +753,7 @@ function handleMessage(msg) {
       if (me) showScreenForRole();
       showToast('↺ Nova rodada iniciada pelo Mestre!');
       break;
+    }
 
     case 'connected_count':
       document.getElementById('m-conn').textContent = msg.count;
