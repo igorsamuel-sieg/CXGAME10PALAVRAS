@@ -739,6 +739,19 @@ function handleMessage(msg) {
       handleSubmitResult(msg);
       break;
 
+    case 'game_reset':
+      // Master reset — take everyone back to their role screen and clear local state
+      selectedWords.clear();
+      gameState = null;
+      const grid = document.getElementById('p-word-grid');
+      if (grid) { grid.innerHTML = ''; grid.dataset.built = ''; }
+      const fb = document.getElementById('p-feedback');
+      if (fb) fb.innerHTML = '';
+      document.getElementById('confetti-area').innerHTML = '';
+      if (me) showScreenForRole();
+      showToast('↺ Nova rodada iniciada pelo Mestre!');
+      break;
+
     case 'connected_count':
       document.getElementById('m-conn').textContent = msg.count;
       break;
