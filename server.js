@@ -219,7 +219,16 @@ wss.on('connection', (ws) => {
             game.playerStates[cinfo.name] = { house: cinfo.house, selected: new Set(), attempts: 0, solved: false };
           }
         }
-        broadcast({ type: 'state', data: buildPublicState() });
+        // Send game_reset to force all clients back to waiting screen
+        broadcast({ type: 'game_reset' });
+        // Then send personalized state to each player
+        for (const [cws, cinfo] of clients) {
+          if (cinfo.type === 'player') {
+            send(cws, { type: 'state', data: buildPublicState(cinfo.name) });
+          } else {
+            send(cws, { type: 'state', data: buildPublicState() });
+          }
+        }
         break;
       }
 
