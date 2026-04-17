@@ -25,10 +25,10 @@ const PARTICIPANTS = {
 };
 
 const HOUSE_WORDS = {
-  'Corvinal':   ['Sabedoria','Conhecimento','Criatividade','Erudição','Inteligência','Livros','Academia','Águia','Lua','Saber'],
-  'Grifinória': ['Coragem','Bravura','Lealdade','Determinação','Heroísmo','Leão','Espada','Audácia','Honra','Força'],
-  'Lufa-Lufa':  ['Paciência','Dedicação','Trabalho','Amizade','Justiça','Texugo','Jardim','Generosidade','Confiança','União'],
-  'Sonserina':  ['Ambição','Astúcia','Poder','Tradição','Grandeza','Serpente','Dungeon','Prestígio','Nobreza','Orgulho'],
+  'Corvinal':   ['Sabedoria','Criatividade','Inovação','Observação','Curiosidade','Imaginação','Raciocínio','Originalidade','Erudição','Espírito questionador'],
+  'Grifinória': ['Coragem','Determinação','Ousadia','Bravura','Heroísmo','Nobreza','Lealdade','Proatividade','Confiabilidade','Espírito de liderança'],
+  'Lufa-Lufa':  ['Justiça','Empatia','Trabalho em equipe','Paciência','Honestidade','Dedicação','Humildade','Gentileza','Resiliência','Espírito acolhedor'],
+  'Sonserina':  ['Poder','Ambição','Astúcia','Inteligência estratégica','Persistência','Autoconfiança elevada','Foco estratégico','Liderança calculista','Habilidade de persuasão','Independência'],
 };
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
