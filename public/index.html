@@ -547,6 +547,8 @@ body::before {
       <button class="btn btn-red"   onclick="masterCmd('reset')">↺ Reiniciar</button>
     </div>
 
+    <div id="m-winner-banner" style="display:none;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);border-radius:4px;padding:14px 20px;margin-bottom:16px;text-align:center;font-family:'Cinzel',serif;font-size:15px;color:var(--gold);letter-spacing:1px;"></div>
+
     <div class="status-bar">
       <div class="stat"><span class="stat-lbl">Status</span>   <span class="stat-val" id="m-status">—</span></div>
       <div class="stat"><span class="stat-lbl">Conectados</span><span class="stat-val" id="m-conn">0</span></div>
@@ -671,7 +673,7 @@ body::before {
     <div class="win-house" id="w-house">—</div>
     <p class="win-attempts" id="w-attempts"></p>
     <p class="win-quote">"Palavras são, na minha humilde opinião, nossa fonte mais inesgotável de magia."</p>
-    <button class="btn btn-gold" onclick="logout()">↺ Voltar ao início</button>
+    <button class="btn btn-gold" id="w-btn-logout" onclick="logout()">↺ Voltar ao início</button>
   </div>
 </div>
 
@@ -722,10 +724,9 @@ function handleMessage(msg) {
     case 'state':
       gameState = msg.data;
       renderAll();
-      // Check if finished and I'm involved
+      // Check if finished — master stays on master screen, others see winner
       if (gameState.status === 'finished' && gameState.winner) {
-        if (me && (me.role === 'spectator' || me.role === 'master' ||
-            (me.role === 'player' && me.name === gameState.winner.name))) {
+        if (me && me.role !== 'master') {
           showWinnerScreen(gameState.winner);
         }
       }
@@ -740,7 +741,7 @@ function handleMessage(msg) {
       break;
 
     case 'game_reset':
-      // Master reset — take everyone back to their role screen and clear local state
+      // Master reset — clear local state and take everyone back to their screen
       selectedWords.clear();
       gameState = null;
       const grid = document.getElementById('p-word-grid');
@@ -748,6 +749,7 @@ function handleMessage(msg) {
       const fb = document.getElementById('p-feedback');
       if (fb) fb.innerHTML = '';
       document.getElementById('confetti-area').innerHTML = '';
+      // Take everyone back to their role screen (out of winner screen)
       if (me) showScreenForRole();
       showToast('↺ Nova rodada iniciada pelo Mestre!');
       break;
@@ -889,6 +891,14 @@ function initMasterUI() { if (gameState) renderMaster(); }
 
 function renderMaster() {
   const s = gameState;
+  // If finished, show winner banner in master screen (master never leaves master screen)
+  const winBanner = document.getElementById('m-winner-banner');
+  if (s.status === 'finished' && s.winner) {
+    winBanner.style.display = 'block';
+    winBanner.innerHTML = \`🏆 <strong>\${s.winner.name}</strong> (\${s.winner.house}) venceu em \${s.winner.attempts} tentativa\${s.winner.attempts>1?'s':''}! &nbsp; <button class="btn btn-red" style="padding:6px 16px;font-size:11px" onclick="masterCmd('reset')">↺ Nova Rodada</button>\`;
+  } else {
+    winBanner.style.display = 'none';
+  }
   document.getElementById('m-status').textContent  = STATUS_MAP[s.status] || s.status;
   document.getElementById('m-conn').textContent    = s.connectedCount;
   const total = s.ranking.filter(r=>r.solved).length;
